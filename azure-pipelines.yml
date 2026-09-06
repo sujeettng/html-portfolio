@@ -11,20 +11,31 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
+
 - task: ArchiveFiles@2
   inputs:
-    rootFolderOrFile: '$(build.sourcesDirectory)'
+    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/package'
     includeRootFolder: false
-    archiveType: zip
-    archiveFile: $(Build.ArtifactStagingDirectory)/package.zip
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/package.zip'
+    replaceExistingArchive: true
 - task: ExtractFiles@1
   inputs:
-    archiveFilePatterns: '**/a/*.zip'
-    destinationFolder: '$(agent.builddirectory)'
+    archiveFilePatterns: '$(Build.ArtifactStagingDirectory)/package.zip'
+    destinationFolder: '$(Build.ArtifactStagingDirectory)/extracted'
     cleanDestinationFolder: true
     overwriteExistingFiles: true
+
+- bash: |
+     find "$(Build.ArtifactStagingDirectory)/extracted" -type f -name "azure-pipelines.yml" -delete
+
+     find "$(Build.ArtifactStagingDirectory)/extracted" -type f -name "goal.png" -delete
+
+     find "$(Build.ArtifactStagingDirectory)/extracted" -type f -name "solution.html" -delete
+  displayName: 'Remove excluded files'
+
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/extracted/'
     ArtifactName: 'package'
     publishLocation: 'Container'
