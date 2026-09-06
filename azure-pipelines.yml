@@ -17,7 +17,7 @@ steps:
     includeRootFolder: false
 - task: ExtractFiles@1
   inputs:
-    archiveFilePatterns: '**/*.zip'
+    archiveFilePatterns: '**/a/*.zip'
     destinationFolder: '$(agent.builddirectory)'
     cleanDestinationFolder: true
     overwriteExistingFiles: true
